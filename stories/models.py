@@ -10,3 +10,15 @@ class Story(models.Model):
 
     class Meta:
         ordering = ['-pub_date']
+
+
+class Review(models.Model):
+    content = models.TextField()
+    pub_date = models.DateTimeField(auto_now=True)
+    story = models.ForeignKey(
+        'stories.Story', related_name='reviews', on_delete=models.CASCADE)
+    author = models.ForeignKey(
+        'users.CustomUser', related_name='reviews', on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['-pub_date']
