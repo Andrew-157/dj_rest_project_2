@@ -10,6 +10,7 @@ djoser = "*"
 djangorestframework-simplejwt = "*"
 pillow = "*"
 django-cleanup = "*"
+drf-nested-routers = "*"
 
 [dev-packages]
 autopep8 = "*"
