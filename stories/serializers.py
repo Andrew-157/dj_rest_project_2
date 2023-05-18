@@ -9,11 +9,18 @@ class StorySerializer(serializers.HyperlinkedModelSerializer):
     author_name = serializers.ReadOnlyField(source='author.username')
     author = serializers.HyperlinkedRelatedField(
         view_name='author-detail', read_only=True)
+    reviews = NestedHyperlinkedRelatedField(
+        many=True,
+        read_only=True,
+        view_name='story-review-detail',
+        parent_lookup_kwargs={'story_pk': 'story__pk'}
+    )
 
     class Meta:
         model = Story
         fields = ['url', 'id', 'title', 'content',
-                  'pub_date', 'author_name', 'author']
+                  'pub_date', 'author_name', 'author',
+                  'reviews']
 
 
 class AuthorSerializer(serializers.HyperlinkedModelSerializer):
