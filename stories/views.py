@@ -1,7 +1,7 @@
 from rest_framework.exceptions import NotFound
 from rest_framework import viewsets, generics, mixins, views
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from stories.serializers import StorySerializer, AuthorSerializer, ReviewsByStorySerializer, ReviewByAuthorSerializer
+from stories.serializers import StorySerializer, AuthorSerializer, ReviewsByStorySerializer, ReviewsByAuthorSerializer
 from stories.models import Story, Review
 from stories.permissions import IsAuthorOrReadOnly
 from users.models import CustomUser
@@ -54,7 +54,7 @@ class ReviewsByAuthorViewSet(mixins.ListModelMixin,
     queryset = Review.objects.\
         select_related('author').\
         select_related('story').all()
-    serializer_class = ReviewByAuthorSerializer
+    serializer_class = ReviewsByAuthorSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
 
     def get_queryset(self):

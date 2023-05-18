@@ -46,7 +46,7 @@ class AuthorSerializer(serializers.HyperlinkedModelSerializer):
                   'email', 'image', 'stories', 'reviews']
 
 
-class ReviewByStorySerializer(NestedHyperlinkedModelSerializer):
+class ReviewsByStorySerializer(NestedHyperlinkedModelSerializer):
     url = NestedHyperlinkedIdentityField(
         view_name='story-review-detail',
         lookup_field='pk',
@@ -79,7 +79,7 @@ class ReviewByStorySerializer(NestedHyperlinkedModelSerializer):
         )
 
 
-class ReviewByAuthorSerializer(NestedHyperlinkedModelSerializer):
+class ReviewsByAuthorSerializer(NestedHyperlinkedModelSerializer):
 
     url = NestedHyperlinkedIdentityField(
         view_name='author-review-detail',
