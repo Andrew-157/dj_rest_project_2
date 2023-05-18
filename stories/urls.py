@@ -11,9 +11,17 @@ stories_router = routers.NestedSimpleRouter(
     router, r'stories', lookup='story'
 )
 stories_router.register(
-    r'reviews', views.ReviewViewSet, basename='story-review')
+    r'reviews', views.ReviewsByStoryViewSet, basename='story-review')
+
+authors_router = routers.NestedSimpleRouter(
+    router, r'authors', lookup='author'
+)
+authors_router.register(
+    r'reviews', views.ReviewsByAuthorViewSet, basename='author-review'
+)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('', include(stories_router.urls))
+    path('', include(stories_router.urls)),
+    path('', include(authors_router.urls))
 ]
