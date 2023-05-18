@@ -22,11 +22,14 @@ class StorySerializer(serializers.HyperlinkedModelSerializer):
         view_name='story-rating-detail',
         parent_lookup_kwargs={'story_pk': 'story__pk'}
     )
+    average_rating = serializers.HyperlinkedIdentityField(
+        view_name='story-average-rating', read_only=True
+    )
 
     class Meta:
         model = Story
         fields = ['url', 'id', 'title', 'content',
-                  'pub_date', 'author_name', 'author',
+                  'pub_date', 'average_rating', 'author_name', 'author',
                   'reviews', 'ratings']
 
 

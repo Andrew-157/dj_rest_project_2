@@ -1,7 +1,10 @@
+from django.db.models import Avg
 from django.db.models.query_utils import Q
-from rest_framework.exceptions import NotFound, MethodNotAllowed
 from rest_framework import viewsets, generics, mixins, views
+from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound, MethodNotAllowed
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.response import Response
 from stories.serializers import StorySerializer, \
     AuthorSerializer, ReviewsByStorySerializer, ReviewsByAuthorSerializer, \
     RatingsByStorySerializer, RatingsByAuthorSerializer
@@ -17,6 +20,14 @@ class StoryViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    @action(detail=True, methods=['GET', 'HEAD', 'OPTIONS'])
+    def average_rating(self, request, *args, **kwargs):
+        story = self.get_object()
+        story_average_rating = Rating.objects.\
+            filter(story__id=story.id).\
+            aggregate(average_rating=Avg('rating'))
+        return Response(story_average_rating)
 
 
 class AuthorViewSet(viewsets.ReadOnlyModelViewSet):
