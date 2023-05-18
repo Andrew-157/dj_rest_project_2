@@ -19,6 +19,9 @@ authors_router = routers.NestedSimpleRouter(
 authors_router.register(
     r'reviews', views.ReviewsByAuthorViewSet, basename='author-review'
 )
+stories_router.register(
+    r'ratings', views.RatingViewSet, basename='story-rating'
+)
 
 urlpatterns = [
     path('', include(router.urls)),

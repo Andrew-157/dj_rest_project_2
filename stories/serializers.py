@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework_nested.relations import NestedHyperlinkedRelatedField, NestedHyperlinkedIdentityField
 from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
 from users.models import CustomUser
-from stories.models import Story, Review
+from stories.models import Story, Review, Rating
 
 
 class StorySerializer(serializers.HyperlinkedModelSerializer):
@@ -16,11 +16,18 @@ class StorySerializer(serializers.HyperlinkedModelSerializer):
         parent_lookup_kwargs={'story_pk': 'story__pk'}
     )
 
+    ratings = NestedHyperlinkedRelatedField(
+        many=True,
+        read_only=True,
+        view_name='story-rating-detail',
+        parent_lookup_kwargs={'story_pk': 'story__pk'}
+    )
+
     class Meta:
         model = Story
         fields = ['url', 'id', 'title', 'content',
                   'pub_date', 'author_name', 'author',
-                  'reviews']
+                  'reviews', 'ratings']
 
 
 class AuthorSerializer(serializers.HyperlinkedModelSerializer):
@@ -101,3 +108,35 @@ class ReviewsByAuthorSerializer(NestedHyperlinkedModelSerializer):
         model = Review
         fields = ['url', 'id', 'content', 'pub_date',
                   'author_name', 'author', 'story_title', 'story']
+
+
+class RatingSerializer(NestedHyperlinkedModelSerializer):
+    url = NestedHyperlinkedIdentityField(
+        view_name='story-rating-detail',
+        lookup_field='pk',
+        parent_lookup_kwargs={
+            'story_pk': 'story__pk'
+        }
+    )
+    author_name = serializers.ReadOnlyField(source='author.username')
+    author = serializers.HyperlinkedRelatedField(
+        view_name='author-detail', read_only=True
+    )
+    story_title = serializers.ReadOnlyField(source='story.title')
+    story = serializers.HyperlinkedRelatedField(
+        view_name='story-detail', read_only=True
+    )
+
+    class Meta:
+        model = Rating
+        fields = ['url', 'id', 'rating', 'pub_date',
+                  'author_name', 'author', 'story_title', 'story']
+
+    def create(self, validated_data):
+        author_id = self.context['author_id']
+        story_id = self.context['story_id']
+        return Rating.objects.create(
+            author_id=author_id,
+            story_id=story_id,
+            **validated_data
+        )

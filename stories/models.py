@@ -29,9 +29,12 @@ class Rating(models.Model):
                       (3, 3), (4, 4), (5, 5),
                       (6, 6), (7, 7), (8, 8),
                       (9, 9), (10, 10)]
-    author = models.OneToOneField('users.CustomUser',
-                                  related_name='ratings', on_delete=models.CASCADE)
+    author = models.ForeignKey('users.CustomUser',
+                               related_name='ratings', on_delete=models.CASCADE)
     story = models.ForeignKey('stories.Story', on_delete=models.CASCADE,
                               related_name='ratings')
     rating = models.PositiveSmallIntegerField(choices=rating_choices)
     pub_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-pub_date']

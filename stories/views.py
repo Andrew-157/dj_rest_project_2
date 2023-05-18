@@ -1,8 +1,10 @@
-from rest_framework.exceptions import NotFound
+from django.db.models.query_utils import Q
+from rest_framework.exceptions import NotFound, MethodNotAllowed
 from rest_framework import viewsets, generics, mixins, views
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from stories.serializers import StorySerializer, AuthorSerializer, ReviewsByStorySerializer, ReviewsByAuthorSerializer
-from stories.models import Story, Review
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from stories.serializers import StorySerializer, \
+    AuthorSerializer, ReviewsByStorySerializer, ReviewsByAuthorSerializer, RatingSerializer
+from stories.models import Story, Review, Rating
 from stories.permissions import IsAuthorOrReadOnly
 from users.models import CustomUser
 
@@ -49,6 +51,7 @@ class ReviewsByStoryViewSet(viewsets.ModelViewSet):
 class ReviewsByAuthorViewSet(mixins.ListModelMixin,
                              mixins.RetrieveModelMixin,
                              mixins.UpdateModelMixin,
+                             mixins.DestroyModelMixin,
                              viewsets.GenericViewSet):
     # returns reviews by a particular author
     queryset = Review.objects.\
@@ -65,3 +68,38 @@ class ReviewsByAuthorViewSet(mixins.ListModelMixin,
             select_related('story').\
             select_related('author').\
             filter(author=self.kwargs['author_pk'])
+
+
+class RatingViewSet(viewsets.ModelViewSet):
+    serializer_class = RatingSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
+    queryset = Rating.objects.\
+        select_related('author').\
+        select_related('story').\
+        all()
+
+    def get_queryset(self):
+        story = Story.objects.filter(pk=self.kwargs['story_pk']).first()
+        if not story:
+            raise NotFound(detail='Story with this id was not found')
+        return Rating.objects.\
+            select_related('story').\
+            select_related('author').\
+            filter(story=self.kwargs['story_pk'])
+
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'author_id': self.request.user.id,
+            'story_id': self.kwargs['story_pk']
+        }
+
+    def create(self, request, *args, **kwargs):
+        rating = Rating.objects.filter(
+            Q(story__id=self.kwargs['story_pk']) &
+            Q(author__id=request.user.id)
+        ).first()
+        if rating:
+            raise MethodNotAllowed(method='POST',
+                                   detail='This user already has a rating on this story')
+        return super().create(request, *args, **kwargs)
