@@ -3,7 +3,8 @@ from rest_framework.exceptions import NotFound, MethodNotAllowed
 from rest_framework import viewsets, generics, mixins, views
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from stories.serializers import StorySerializer, \
-    AuthorSerializer, ReviewsByStorySerializer, ReviewsByAuthorSerializer, RatingSerializer
+    AuthorSerializer, ReviewsByStorySerializer, ReviewsByAuthorSerializer, \
+    RatingsByStorySerializer, RatingsByAuthorSerializer
 from stories.models import Story, Review, Rating
 from stories.permissions import IsAuthorOrReadOnly
 from users.models import CustomUser
@@ -70,8 +71,8 @@ class ReviewsByAuthorViewSet(mixins.ListModelMixin,
             filter(author=self.kwargs['author_pk'])
 
 
-class RatingViewSet(viewsets.ModelViewSet):
-    serializer_class = RatingSerializer
+class RatingsByStoryViewSet(viewsets.ModelViewSet):
+    serializer_class = RatingsByStorySerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
     queryset = Rating.objects.\
         select_related('author').\
@@ -103,3 +104,24 @@ class RatingViewSet(viewsets.ModelViewSet):
             raise MethodNotAllowed(method='POST',
                                    detail='This user already has a rating on this story')
         return super().create(request, *args, **kwargs)
+
+
+class RatingsByAuthorViewSet(mixins.ListModelMixin,
+                             mixins.RetrieveModelMixin,
+                             mixins.UpdateModelMixin,
+                             mixins.DestroyModelMixin,
+                             viewsets.GenericViewSet):
+    queryset = Rating.objects.\
+        select_related('author').\
+        select_related('story').all()
+    serializer_class = RatingsByAuthorSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
+
+    def get_queryset(self):
+        author = CustomUser.objects.filter(pk=self.kwargs['author_pk']).first()
+        if not author:
+            raise NotFound(detail='Author with this id was not found')
+        return Rating.objects.\
+            select_related('story').\
+            select_related('author').\
+            filter(author=self.kwargs['author_pk'])

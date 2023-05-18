@@ -20,8 +20,10 @@ authors_router.register(
     r'reviews', views.ReviewsByAuthorViewSet, basename='author-review'
 )
 stories_router.register(
-    r'ratings', views.RatingViewSet, basename='story-rating'
+    r'ratings', views.RatingsByStoryViewSet, basename='story-rating'
 )
+authors_router.register(
+    r'ratings', views.RatingsByAuthorViewSet, basename='author-rating')
 
 urlpatterns = [
     path('', include(router.urls)),

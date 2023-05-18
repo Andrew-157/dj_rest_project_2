@@ -47,10 +47,17 @@ class AuthorSerializer(serializers.HyperlinkedModelSerializer):
         parent_lookup_kwargs={'author_pk': 'author__pk'}
     )
 
+    ratings = NestedHyperlinkedRelatedField(
+        many=True,
+        read_only=True,
+        view_name='author-rating-detail',
+        parent_lookup_kwargs={'author_pk': 'author__pk'}
+    )
+
     class Meta:
         model = CustomUser
         fields = ['url', 'id', 'username',
-                  'email', 'image', 'stories', 'reviews']
+                  'email', 'image', 'stories', 'reviews', 'ratings']
 
 
 class ReviewsByStorySerializer(NestedHyperlinkedModelSerializer):
@@ -110,7 +117,7 @@ class ReviewsByAuthorSerializer(NestedHyperlinkedModelSerializer):
                   'author_name', 'author', 'story_title', 'story']
 
 
-class RatingSerializer(NestedHyperlinkedModelSerializer):
+class RatingsByStorySerializer(NestedHyperlinkedModelSerializer):
     url = NestedHyperlinkedIdentityField(
         view_name='story-rating-detail',
         lookup_field='pk',
@@ -140,3 +147,26 @@ class RatingSerializer(NestedHyperlinkedModelSerializer):
             story_id=story_id,
             **validated_data
         )
+
+
+class RatingsByAuthorSerializer(NestedHyperlinkedModelSerializer):
+    url = NestedHyperlinkedIdentityField(
+        view_name='author-rating-detail',
+        lookup_field='pk',
+        parent_lookup_kwargs={
+            'author_pk': 'author__pk'
+        }
+    )
+    author_name = serializers.ReadOnlyField(source='author.username')
+    author = serializers.HyperlinkedRelatedField(
+        view_name='author-detail', read_only=True
+    )
+    story_title = serializers.ReadOnlyField(source='story.title')
+    story = serializers.HyperlinkedRelatedField(
+        view_name='story-detail', read_only=True
+    )
+
+    class Meta:
+        model = Rating
+        fields = ['url', 'id', 'rating', 'pub_date',
+                  'author_name', 'author', 'story_title', 'story']
