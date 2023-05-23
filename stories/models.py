@@ -11,6 +11,9 @@ class Story(models.Model):
     class Meta:
         ordering = ['-pub_date']
 
+    def __str__(self):
+        return self.title
+
 
 class Review(models.Model):
     content = models.TextField()

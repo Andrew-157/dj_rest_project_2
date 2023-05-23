@@ -31,7 +31,7 @@ class StoryViewSet(viewsets.ModelViewSet):
 
 
 class AuthorViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = CustomUser.objects.all()
+    queryset = CustomUser.objects.filter(is_superuser=False).all()
     serializer_class = AuthorSerializer
 
 
