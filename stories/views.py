@@ -83,6 +83,7 @@ class ReviewsByAuthorViewSet(mixins.ListModelMixin,
 
 
 class RatingsByStoryViewSet(viewsets.ModelViewSet):
+    # returns ratings left on particular story
     serializer_class = RatingsByStorySerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
     queryset = Rating.objects.\
@@ -122,6 +123,7 @@ class RatingsByAuthorViewSet(mixins.ListModelMixin,
                              mixins.UpdateModelMixin,
                              mixins.DestroyModelMixin,
                              viewsets.GenericViewSet):
+    # returns ratings left by a particular author
     queryset = Rating.objects.\
         select_related('author').\
         select_related('story').all()
