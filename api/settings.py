@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'djoser',
     'rest_framework',
     'users',
+    'fiction'
 ]
 
 MIDDLEWARE = [
