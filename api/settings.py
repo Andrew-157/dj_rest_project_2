@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'djoser',
     'rest_framework',
-    'finances'
+    'users',
+    'finances',
 ]
 
 MIDDLEWARE = [
