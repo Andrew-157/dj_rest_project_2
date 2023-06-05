@@ -11,6 +11,9 @@ djangorestframework-simplejwt = "*"
 drf-nested-routers = "*"
 psycopg2 = "*"
 django-environ = "*"
+pillow = "*"
+django-cleanup = "*"
+django-filter = "*"
 
 [dev-packages]
 autopep8 = "*"
