@@ -27,8 +27,17 @@ class QuestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Question
         fields = [
-            'url', 'id', 'author', 'title', 'slug', 'tags', 'details', 'published', 'updated'
+            'url', 'id', 'author', 'title', 'slug',
+            'tags', 'details', 'published', 'updated',
+            'answers'
         ]
+
+    answers = serializers.SerializerMethodField(
+        method_name='count_answers'
+    )
+
+    def count_answers(self, question: Question):
+        return Answer.objects.filter(question__id=question.id).count()
 
 
 class CreateUpdateQuestionSerializer(serializers.HyperlinkedModelSerializer):
