@@ -21,7 +21,7 @@ class Question(models.Model):
     details = models.TextField(null=True)
     author = models.ForeignKey(
         CustomUser, related_name='questions', on_delete=models.CASCADE)
-    published = models.DateTimeField(auto_now_add=True, null=True)
+    published = models.DateTimeField(auto_now=True, null=True)
     tags = models.ManyToManyField(Tag, related_name='questions')
 
     def __str__(self):
@@ -33,3 +33,15 @@ class Question(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title)
         super(Question, self).save(*args, **kwargs)
+
+
+class Answer(models.Model):
+    author = models.ForeignKey(
+        CustomUser, related_name='answers', on_delete=models.CASCADE)
+    question = models.ForeignKey(
+        Question, related_name='answers', on_delete=models.CASCADE)
+    content = models.TextField()
+    published = models.DateTimeField(auto_now=True, null=True)
+
+    class Meta:
+        ordering = ['id']
