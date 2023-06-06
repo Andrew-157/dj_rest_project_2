@@ -21,7 +21,8 @@ class Question(models.Model):
     details = models.TextField(null=True)
     author = models.ForeignKey(
         CustomUser, related_name='questions', on_delete=models.CASCADE)
-    published = models.DateTimeField(auto_now=True, null=True)
+    published = models.DateTimeField(auto_now_add=True, null=True)
+    updated = models.DateTimeField(auto_now=True, null=True)
     tags = models.ManyToManyField(Tag, related_name='questions')
 
     def __str__(self):
@@ -41,7 +42,8 @@ class Answer(models.Model):
     question = models.ForeignKey(
         Question, related_name='answers', on_delete=models.CASCADE)
     content = models.TextField()
-    published = models.DateTimeField(auto_now=True, null=True)
+    published = models.DateTimeField(auto_now_add=True, null=True)
+    updated = models.DateTimeField(auto_now=True, null=True)
 
     class Meta:
         ordering = ['id']
