@@ -15,7 +15,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
                        filters.OrderingFilter, DjangoFilterBackend]
     search_fields = ['title', 'slug', 'details', 'tags__name', 'tags__slug']
     ordering_fields = ['title', 'slug', 'details',
-                       'published', 'tags__name', 'tags__slug']
+                       'published', 'updated', 'tags__name', 'tags__slug']
 
     def perform_create(self, serializer):
         serializer.save(author_id=self.request.user.id)

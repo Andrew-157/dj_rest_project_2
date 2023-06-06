@@ -27,7 +27,7 @@ class QuestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Question
         fields = [
-            'url', 'id', 'author', 'title', 'slug', 'tags', 'details', 'published'
+            'url', 'id', 'author', 'title', 'slug', 'tags', 'details', 'published', 'updated'
         ]
 
 
@@ -37,7 +37,7 @@ class CreateUpdateQuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = [
-            'url', 'id', 'title', 'details', 'tags', 'published'
+            'url', 'id', 'title', 'details', 'tags', 'published', 'updated'
         ]
 
     def create(self, validated_data):
