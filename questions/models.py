@@ -1,6 +1,5 @@
 from django.db import models
 from django.template.defaultfilters import slugify
-from taggit.managers import TaggableManager
 from users.models import CustomUser
 
 
@@ -10,7 +9,7 @@ class Question(models.Model):
     details = models.TextField(null=True)
     author = models.ForeignKey(
         CustomUser, related_name='questions', on_delete=models.CASCADE)
-    tags = TaggableManager()
+    published = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
         return self.title

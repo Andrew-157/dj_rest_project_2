@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_cleanup.apps.CleanupConfig',
-    'taggit',
     'django_filters',
     'djoser',
     'rest_framework',
@@ -164,5 +163,3 @@ DJOSER = {
         'current_user': 'users.serializers.UserSerializer'
     }
 }
-
-TAGGIT_CASE_INSENSITIVE = True
