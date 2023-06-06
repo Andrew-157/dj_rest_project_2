@@ -14,6 +14,7 @@ django-environ = "*"
 pillow = "*"
 django-cleanup = "*"
 django-filter = "*"
+django-taggit = "*"
 
 [dev-packages]
 autopep8 = "*"
