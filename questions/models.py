@@ -3,6 +3,18 @@ from django.template.defaultfilters import slugify
 from users.models import CustomUser
 
 
+class Tag(models.Model):
+    name = models.CharField(max_length=70)
+    slug = models.SlugField(max_length=80)
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(Tag, self).save(*args, **kwargs)
+
+
 class Question(models.Model):
     title = models.CharField(max_length=155)
     slug = models.SlugField(max_length=200)
@@ -10,6 +22,7 @@ class Question(models.Model):
     author = models.ForeignKey(
         CustomUser, related_name='questions', on_delete=models.CASCADE)
     published = models.DateTimeField(auto_now_add=True, null=True)
+    tags = models.ManyToManyField(Tag, related_name='questions')
 
     def __str__(self):
         return self.title
