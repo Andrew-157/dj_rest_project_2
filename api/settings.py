@@ -164,3 +164,5 @@ DJOSER = {
         'current_user': 'users.serializers.UserSerializer'
     }
 }
+
+TAGGIT_CASE_INSENSITIVE = True
