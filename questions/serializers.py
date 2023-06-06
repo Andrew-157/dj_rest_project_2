@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
 from rest_framework_nested.relations import NestedHyperlinkedIdentityField, NestedHyperlinkedRelatedField
-from questions.models import Question, Tag
+from questions.models import Question, Tag, Answer
 from users.models import CustomUser
 
 
@@ -31,13 +31,14 @@ class QuestionSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
-class CreateUpdateQuestionSerializer(serializers.ModelSerializer):
+class CreateUpdateQuestionSerializer(serializers.HyperlinkedModelSerializer):
     tags = TagsSerializerField(required=False)
+    author = serializers.ReadOnlyField(source='author.username')
 
     class Meta:
         model = Question
         fields = [
-            'url', 'id', 'title', 'details', 'tags', 'published', 'updated'
+            'url', 'id', 'author', 'title', 'details', 'tags', 'published', 'updated'
         ]
 
     def create(self, validated_data):
@@ -65,3 +66,39 @@ class CreateUpdateQuestionSerializer(serializers.ModelSerializer):
                 tags.append(tag)
             instance.tags.set(tags)
         return instance
+
+
+class AnswerSerializer(NestedHyperlinkedModelSerializer):
+    url = NestedHyperlinkedIdentityField(
+        view_name='question-answer-detail',
+        lookup_field='pk',
+        parent_lookup_kwargs={
+            'question_pk': 'question__pk'
+        }
+    )
+    author = AuthorSerializer()
+    question = serializers.ReadOnlyField(source='question.title')
+
+    class Meta:
+        model = Answer
+        fields = [
+            'url', 'id', 'question', 'author', 'content', 'published', 'updated'
+        ]
+
+
+class CreateUpdateAnswerSerializer(NestedHyperlinkedModelSerializer):
+    url = NestedHyperlinkedIdentityField(
+        view_name='question-answer-detail',
+        lookup_field='pk',
+        parent_lookup_kwargs={
+            'question_pk': 'question__pk'
+        }
+    )
+    author = serializers.ReadOnlyField(source='author.username')
+    question = serializers.ReadOnlyField(source='question.title')
+
+    class Meta:
+        model = Answer
+        fields = [
+            'url', 'id', 'question', 'author', 'content', 'published', 'updated'
+        ]
