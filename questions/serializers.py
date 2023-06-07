@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
 from rest_framework_nested.relations import NestedHyperlinkedIdentityField, NestedHyperlinkedRelatedField
-from questions.models import Question, Tag, Answer
+from questions.models import Question, Tag, Answer, AnswerVote
 from users.models import CustomUser
 
 
@@ -111,3 +111,26 @@ class CreateUpdateAnswerSerializer(NestedHyperlinkedModelSerializer):
         fields = [
             'url', 'id', 'question', 'author', 'content', 'published', 'updated'
         ]
+
+
+class AnswerVoteSerializer(NestedHyperlinkedModelSerializer):
+    url = NestedHyperlinkedIdentityField(
+        view_name='question-answer-vote-detail',
+        lookup_field='pk',
+        parent_lookup_kwargs={
+            'answer_pk': 'answer__pk',
+            'question_pk': 'answer__question__pk'
+        }
+    )
+
+    # parent_lookup_kwargs = {
+    #     'answer_pk': 'answer__pk',
+    #     'question_pk': 'answer__question__pk'
+    # }
+
+    author = serializers.ReadOnlyField(source='author.username')
+    answer = serializers.ReadOnlyField(source='answer.content')
+
+    class Meta:
+        model = AnswerVote
+        fields = ['url', 'id', 'author', 'answer', 'useful']
