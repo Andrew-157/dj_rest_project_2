@@ -14,8 +14,22 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = CustomUser
         fields = [
-            'url', 'username', 'image'
+            'url', 'username', 'image', 'questions_count', 'answers_count'
         ]
+
+    questions_count = serializers.SerializerMethodField(
+        method_name='count_questions'
+    )
+
+    def count_questions(self, customuser: CustomUser):
+        return Question.objects.filter(author=customuser).count()
+
+    answers_count = serializers.SerializerMethodField(
+        method_name='count_questions'
+    )
+
+    def count_questions(self, customuser: CustomUser):
+        return Answer.objects.filter(author=customuser).count()
 
 
 class TagsSerializerField(serializers.ListField):
