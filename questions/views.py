@@ -5,9 +5,10 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound, MethodNotAllowed
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, SAFE_METHODS
-from questions.models import Question, Answer, AnswerVote
+from questions.models import Question, Answer, AnswerVote, QuestionComment
 from questions.serializers import QuestionSerializer, CreateUpdateQuestionSerializer, \
-    AnswerSerializer, CreateUpdateAnswerSerializer, AnswerVoteSerializer
+    AnswerSerializer, CreateUpdateAnswerSerializer, AnswerVoteSerializer, QuestionCommentSerializer,\
+    CreateUpdateQuestionCommentSerializer
 from questions.permissions import IsAuthorOrReadOnly, IsAuthor
 
 
@@ -99,5 +100,30 @@ class AnswerVoteViewSet(viewsets.ModelViewSet):
                                    detail='This user already voted for this answer, vote can be either changed or deleted')
         serializer.save(
             answer_id=self.kwargs['answer_pk'],
+            author_id=self.request.user.id
+        )
+
+
+class QuestionCommentViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
+
+    def get_queryset(self):
+        question_pk = self.kwargs['question_pk']
+        question = Question.objects.filter(pk=question_pk).first()
+        if not question:
+            raise NotFound(
+                detail=f"Question with id {question_pk} was not found.")
+        return QuestionComment.objects.select_related('question', 'author').\
+            filter(question=question)
+
+    def get_serializer_class(self):
+        if self.request.method in SAFE_METHODS:
+            return QuestionCommentSerializer
+        else:
+            return CreateUpdateQuestionCommentSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(
+            question_id=self.kwargs['question_pk'],
             author_id=self.request.user.id
         )

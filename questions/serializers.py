@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_nested.serializers import NestedHyperlinkedModelSerializer
 from rest_framework_nested.relations import NestedHyperlinkedIdentityField, NestedHyperlinkedRelatedField
-from questions.models import Question, Tag, Answer, AnswerVote
+from questions.models import Question, Tag, Answer, AnswerVote, QuestionComment
 from users.models import CustomUser
 
 
@@ -151,3 +151,40 @@ class AnswerVoteSerializer(NestedHyperlinkedModelSerializer):
     class Meta:
         model = AnswerVote
         fields = ['url', 'id', 'author', 'answer', 'useful']
+
+
+class QuestionCommentSerializer(serializers.HyperlinkedModelSerializer):
+    url = NestedHyperlinkedIdentityField(
+        view_name='question-comment-detail',
+        lookup_field='pk',
+        parent_lookup_kwargs={
+            'question_pk': 'question__pk'
+        }
+    )
+
+    author = AuthorSerializer()
+    question = serializers.ReadOnlyField(source='question.title')
+
+    class Meta:
+        model = QuestionComment
+        fields = ['url', 'id', 'question', 'author',
+                  'content', 'published', 'updated']
+
+
+class CreateUpdateQuestionCommentSerializer(serializers.HyperlinkedModelSerializer):
+    url = NestedHyperlinkedIdentityField(
+        view_name='question-comment-detail',
+        lookup_field='pk',
+        parent_lookup_kwargs={
+            'question_pk': 'question__pk'
+        }
+    )
+
+    author = serializers.ReadOnlyField(source='author.username')
+    question = serializers.ReadOnlyField(source='question.title')
+
+    class Meta:
+        model = QuestionComment
+        fields = [
+            'url', 'id', 'question', 'author', 'content', 'published', 'updated'
+        ]

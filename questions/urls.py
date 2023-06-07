@@ -12,12 +12,19 @@ router.register(r'questions', views.QuestionViewSet, basename='question')
 questions_router = routers.NestedSimpleRouter(
     router, r'questions', lookup='question'
 )
+
+
 questions_router.register(
     r'answers', views.AnswerViewSet, basename='question-answer'
 )
 # /questions/{question_pk}/answers/
 # /questions/{question_pk}/answers/{pk}
 
+questions_router.register(
+    r'comments', views.QuestionCommentViewSet, basename='question-comment'
+)
+# /questions/{question_pk}/comments/
+# /questions/{question_pk}/comments/{pk}
 
 answers_router = routers.NestedSimpleRouter(
     questions_router, r'answers', lookup='answer'
