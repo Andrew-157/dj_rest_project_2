@@ -56,3 +56,19 @@ class AnswerVote(models.Model):
 
     class Meta:
         unique_together = ('author', 'answer')
+        ordering = ['id']
+
+
+class QuestionComment(models.Model):
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    question = models.ForeignKey(
+        Question, on_delete=models.CASCADE, related_name='comments')
+    content = models.TextField()
+    published = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return self.content
