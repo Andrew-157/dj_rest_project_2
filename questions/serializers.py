@@ -27,13 +27,17 @@ class QuestionSerializer(serializers.HyperlinkedModelSerializer):
     get_answers = serializers.HyperlinkedIdentityField(
         view_name='question-get-answers', read_only=True
     )
+    get_comments = serializers.HyperlinkedIdentityField(
+        view_name='question-get-comments', read_only=True
+    )
 
     class Meta:
         model = Question
         fields = [
             'url', 'id', 'author', 'title', 'slug',
             'tags', 'details', 'published', 'updated',
-            'answers_count', 'get_answers', 'comments_count'
+            'answers_count', 'get_answers', 'comments_count',
+            'get_comments'
         ]
 
     answers_count = serializers.SerializerMethodField(

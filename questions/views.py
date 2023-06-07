@@ -41,6 +41,16 @@ class QuestionViewSet(viewsets.ModelViewSet):
             answers, many=True, context={'request': request})
         return Response(serializer.data)
 
+    @action(detail=True, methods=['GET', 'HEAD', 'OPTIONS'])
+    def get_comments(self, request, *args, **kwargs):
+        question = self.get_object()
+        comments = QuestionComment.objects.\
+            select_related('author', 'question').\
+            filter(question=question).all()
+        serializer = QuestionCommentSerializer(comments, many=True,
+                                               context={'request': request})
+        return Response(serializer.data)
+
 
 class AnswerViewSet(viewsets.ModelViewSet):
     # queryset = Answer.objects.\
