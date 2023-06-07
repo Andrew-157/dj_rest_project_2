@@ -47,3 +47,12 @@ class Answer(models.Model):
 
     class Meta:
         ordering = ['id']
+
+
+class AnswerVote(models.Model):
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
+    useful = models.BooleanField()
+
+    class Meta:
+        unique_together = ('author', 'answer')
