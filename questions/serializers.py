@@ -107,8 +107,8 @@ class AnswerSerializer(NestedHyperlinkedModelSerializer):
         votes_useful = votes.filter(useful=True).count()
         votes_not_useful = votes.filter(useful=False).count()
         return {
-            'considered useful': votes_useful,
-            'considered not useful': votes_not_useful
+            'This answer is useful': votes_useful,
+            'This answer is not useful': votes_not_useful
         }
 
 
