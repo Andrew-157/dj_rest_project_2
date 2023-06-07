@@ -5,7 +5,7 @@ from questions.models import Question, Tag, Answer, AnswerVote, QuestionComment
 from users.models import CustomUser
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class AuthorSerializer(serializers.HyperlinkedModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='user-detail',
         lookup_field='pk'
@@ -13,8 +13,28 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = CustomUser
+        fields = ['url', 'id', 'username', 'image']
+
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name='user-detail',
+        lookup_field='pk'
+    )
+
+    get_questions = serializers.HyperlinkedIdentityField(
+        view_name='user-get-questions', read_only=True
+    )
+
+    get_answers = serializers.HyperlinkedIdentityField(
+        view_name='user-get-answers', read_only=True
+    )
+
+    class Meta:
+        model = CustomUser
         fields = [
-            'url', 'username', 'image', 'questions_count', 'answers_count'
+            'url', 'username', 'image', 'questions_count',
+            'get_questions', 'answers_count', 'get_answers'
         ]
 
     questions_count = serializers.SerializerMethodField(
@@ -40,7 +60,7 @@ class TagsSerializerField(serializers.ListField):
 
 
 class QuestionSerializer(serializers.HyperlinkedModelSerializer):
-    author = UserSerializer()
+    author = AuthorSerializer()
     tags = TagsSerializerField(required=False)
 
     get_answers = serializers.HyperlinkedIdentityField(
@@ -119,7 +139,7 @@ class AnswerSerializer(NestedHyperlinkedModelSerializer):
             'question_pk': 'question__pk'
         }
     )
-    author = UserSerializer()
+    author = AuthorSerializer()
     question = serializers.ReadOnlyField(source='question.title')
 
     class Meta:
@@ -192,7 +212,7 @@ class QuestionCommentSerializer(serializers.HyperlinkedModelSerializer):
         }
     )
 
-    author = UserSerializer()
+    author = AuthorSerializer()
     question = serializers.ReadOnlyField(source='question.title')
 
     class Meta:

@@ -143,3 +143,28 @@ class QuestionCommentViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserSerializer
     queryset = CustomUser.objects.all()
+    filter_backends = [filters.SearchFilter,
+                       filters.OrderingFilter, DjangoFilterBackend]
+    search_fields = ['username']
+    ordering_fields = ['id', 'username']
+
+    @action(detail=True, methods=['GET', 'HEAD', 'OPTIONS'])
+    def get_questions(self, request, *args, **kwargs):
+        user = self.get_object()
+        questions = Question.objects.\
+            select_related('author').prefetch_related('tags').\
+            filter(author=user).all()
+        serializer = QuestionSerializer(
+            questions, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['GET', 'HEAD', 'OPTIONS'])
+    def get_answers(self, request, *args, **kwargs):
+        user = self.get_object()
+        answers = Answer.objects.\
+            select_related('author', 'question').\
+            filter(author=user).all()
+        serializer = AnswerSerializer(
+            answers, many=True, context={'request': request}
+        )
+        return Response(serializer.data)
