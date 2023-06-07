@@ -9,6 +9,10 @@ router.register(r'questions', views.QuestionViewSet, basename='question')
 # /questions/
 # /questions/{pk}/
 
+router.register(r'users', views.UserViewSet, basename='user')
+# /users/
+# /users/{pk}
+
 questions_router = routers.NestedSimpleRouter(
     router, r'questions', lookup='question'
 )

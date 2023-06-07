@@ -5,11 +5,16 @@ from questions.models import Question, Tag, Answer, AnswerVote, QuestionComment
 from users.models import CustomUser
 
 
-class AuthorSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name='user-detail',
+        lookup_field='pk'
+    )
+
     class Meta:
         model = CustomUser
         fields = [
-            'username', 'image'
+            'url', 'username', 'image'
         ]
 
 
@@ -21,7 +26,7 @@ class TagsSerializerField(serializers.ListField):
 
 
 class QuestionSerializer(serializers.HyperlinkedModelSerializer):
-    author = AuthorSerializer()
+    author = UserSerializer()
     tags = TagsSerializerField(required=False)
 
     get_answers = serializers.HyperlinkedIdentityField(
@@ -100,7 +105,7 @@ class AnswerSerializer(NestedHyperlinkedModelSerializer):
             'question_pk': 'question__pk'
         }
     )
-    author = AuthorSerializer()
+    author = UserSerializer()
     question = serializers.ReadOnlyField(source='question.title')
 
     class Meta:
@@ -173,7 +178,7 @@ class QuestionCommentSerializer(serializers.HyperlinkedModelSerializer):
         }
     )
 
-    author = AuthorSerializer()
+    author = UserSerializer()
     question = serializers.ReadOnlyField(source='question.title')
 
     class Meta:

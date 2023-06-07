@@ -8,8 +8,9 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticate
 from questions.models import Question, Answer, AnswerVote, QuestionComment
 from questions.serializers import QuestionSerializer, CreateUpdateQuestionSerializer, \
     AnswerSerializer, CreateUpdateAnswerSerializer, AnswerVoteSerializer, QuestionCommentSerializer,\
-    CreateUpdateQuestionCommentSerializer
+    CreateUpdateQuestionCommentSerializer, UserSerializer
 from questions.permissions import IsAuthorOrReadOnly, IsAuthor
+from users.models import CustomUser
 
 
 class QuestionViewSet(viewsets.ModelViewSet):
@@ -137,3 +138,8 @@ class QuestionCommentViewSet(viewsets.ModelViewSet):
             question_id=self.kwargs['question_pk'],
             author_id=self.request.user.id
         )
+
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = UserSerializer
+    queryset = CustomUser.objects.all()
