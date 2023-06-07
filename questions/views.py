@@ -1,7 +1,9 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.exceptions import NotFound, MethodNotAllowed
 from rest_framework import filters
 from rest_framework import viewsets, mixins
+from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound, MethodNotAllowed
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, SAFE_METHODS
 from questions.models import Question, Answer, AnswerVote
 from questions.serializers import QuestionSerializer, CreateUpdateQuestionSerializer, \
@@ -27,6 +29,16 @@ class QuestionViewSet(viewsets.ModelViewSet):
             return QuestionSerializer
         else:
             return CreateUpdateQuestionSerializer
+
+    @action(detail=True, methods=['GET', 'HEAD', 'OPTIONS'])
+    def get_answers(self, request, *args, **kwargs):
+        question = self.get_object()
+        answers = Answer.objects.\
+            select_related('author', 'question').filter(
+                question=question).all()
+        serializer = AnswerSerializer(
+            answers, many=True, context={'request': request})
+        return Response(serializer.data)
 
 
 class AnswerViewSet(viewsets.ModelViewSet):

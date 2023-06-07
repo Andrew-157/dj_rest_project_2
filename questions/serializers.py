@@ -24,15 +24,19 @@ class QuestionSerializer(serializers.HyperlinkedModelSerializer):
     author = AuthorSerializer()
     tags = TagsSerializerField(required=False)
 
+    get_answers = serializers.HyperlinkedIdentityField(
+        view_name='question-get-answers', read_only=True
+    )
+
     class Meta:
         model = Question
         fields = [
             'url', 'id', 'author', 'title', 'slug',
             'tags', 'details', 'published', 'updated',
-            'answers'
+            'answers_count', 'get_answers'
         ]
 
-    answers = serializers.SerializerMethodField(
+    answers_count = serializers.SerializerMethodField(
         method_name='count_answers'
     )
 
@@ -91,8 +95,21 @@ class AnswerSerializer(NestedHyperlinkedModelSerializer):
     class Meta:
         model = Answer
         fields = [
-            'url', 'id', 'question', 'author', 'content', 'published', 'updated'
+            'url', 'id', 'question', 'author', 'content', 'published', 'updated', 'votes'
         ]
+
+    votes = serializers.SerializerMethodField(
+        method_name='count_votes'
+    )
+
+    def count_votes(self, answer: Answer):
+        votes = AnswerVote.objects.filter(answer=answer).all()
+        votes_useful = votes.filter(useful=True).count()
+        votes_not_useful = votes.filter(useful=False).count()
+        return {
+            'considered useful': votes_useful,
+            'considered not useful': votes_not_useful
+        }
 
 
 class CreateUpdateAnswerSerializer(NestedHyperlinkedModelSerializer):
