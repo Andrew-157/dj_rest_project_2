@@ -142,7 +142,7 @@ class QuestionCommentViewSet(viewsets.ModelViewSet):
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserSerializer
-    queryset = CustomUser.objects.all()
+    queryset = CustomUser.objects.all().filter(is_superuser=False)
     filter_backends = [filters.SearchFilter,
                        filters.OrderingFilter, DjangoFilterBackend]
     search_fields = ['username']
